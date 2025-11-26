@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: custom-gateway
+  threads:
+    virtual:
+      enabled: true

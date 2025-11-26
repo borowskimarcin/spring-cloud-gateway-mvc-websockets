@@ -1,0 +1,8 @@
+### WebSocket connecion
+WEBSOCKET ws://localhost:8080/hello
+
+hello
+
+
+### Http connection
+GET http://localhost:8080/customers

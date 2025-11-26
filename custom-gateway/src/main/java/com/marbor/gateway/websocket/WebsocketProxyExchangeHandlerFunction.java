@@ -11,6 +11,7 @@ import org.springframework.cloud.gateway.server.mvc.common.MvcUtils;
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayServerResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 ///
 /// ### Notes
 /// - For the upstream WebSocket handshake we use the **Jetty client**, because the Spring `StandardWebSocketClient` implementation does **not** expose the WebSocket handshake status or headers.
-@Service
+@Component
 public class WebsocketProxyExchangeHandlerFunction implements HandlerFunction<ServerResponse> {
 
     private static final Logger log = LoggerFactory.getLogger(WebsocketProxyExchangeHandlerFunction.class);

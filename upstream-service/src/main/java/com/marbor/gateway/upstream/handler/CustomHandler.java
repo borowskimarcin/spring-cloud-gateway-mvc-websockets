@@ -1,4 +1,4 @@
-package com.marbor.gateway.upstream.handlers;
+package com.marbor.gateway.upstream.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

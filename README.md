@@ -1,9 +1,8 @@
 # Spring Cloud Gateway with WebSockets
 
-This project demonstrates how to use **Spring Cloud Gateway MVC** with a **custom WebSocket implementation**. Since Spring Cloud Gateway MVC currently does **not** provide built-in support for WebSocket proxying, a custom solution is required.
-
-For more details, see the open issue tracking WebSocket support in Spring Cloud Gateway MVC:
-[https://github.com/spring-cloud/spring-cloud-gateway/issues/3442](https://github.com/spring-cloud/spring-cloud-gateway/issues/3442)
+This project demonstrates how to use **Spring Cloud Gateway MVC** with a **custom WebSocket implementation**. 
+Since Spring Cloud Gateway MVC currently does **not** provide built-in support for WebSocket proxying, a custom solution is required
+(for more details, see the open issue in Spring Cloud Gateway MVC: [https://github.com/spring-cloud/spring-cloud-gateway/issues/3442](https://github.com/spring-cloud/spring-cloud-gateway/issues/3442)).
 
 ## Custom Gateway
 **Proxies WebSocket requests between the client and the upstream service.**

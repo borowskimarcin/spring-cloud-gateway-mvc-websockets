@@ -2,7 +2,6 @@ package com.marbor.gateway.websocket;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.exceptions.UpgradeException;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.slf4j.Logger;
@@ -12,7 +11,6 @@ import org.springframework.cloud.gateway.server.mvc.handler.GatewayServerRespons
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.function.HandlerFunction;
@@ -49,9 +47,11 @@ public class WebsocketProxyExchangeHandlerFunction implements HandlerFunction<Se
             .map(String::toLowerCase)
             .collect(Collectors.toSet());
     private final WebSocketClient websocketClient;
+    private final WebSocketExecutionExceptionHandler webSocketExecutionExceptionHandler;
 
-    public WebsocketProxyExchangeHandlerFunction(WebSocketClient websocketClient) {
+    public WebsocketProxyExchangeHandlerFunction(WebSocketClient websocketClient, WebSocketExecutionExceptionHandler webSocketExecutionExceptionHandler) {
         this.websocketClient = websocketClient;
+        this.webSocketExecutionExceptionHandler = webSocketExecutionExceptionHandler;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class WebsocketProxyExchangeHandlerFunction implements HandlerFunction<Se
             CompletableFuture<Session> upstreamSession = websocketClient.connect(upstreamSessionHandler, upstreamUpgradeRequest, upstreamUpgradeListener);
             upstreamSession.get();
             boolean isProxyingReady = upstreamSessionHandler.awaitWebsocketProxyingReady(20, TimeUnit.SECONDS);
-            boolean isHandshakeResponseReady = upstreamUpgradeListener.awaitUntilInvoked(20, TimeUnit.SECONDS);
+            boolean isHandshakeResponseReady = upstreamUpgradeListener.awaitForHandshakeResponse(20, TimeUnit.SECONDS);
             if (!isProxyingReady || !isHandshakeResponseReady) {
                 final String message = String.format("Timeout waiting for the WebSocket proxying: %s", upstreamWebsocketUrl);
                 log.error(message);
@@ -83,7 +83,7 @@ public class WebsocketProxyExchangeHandlerFunction implements HandlerFunction<Se
             Thread.currentThread().interrupt();
             throw new RuntimeException("Interruption exception during the WebSocket handshake between gateway and upstream", interruptedException);
         } catch (ExecutionException executionException) {
-            return handleExecutionException(executionException, upstreamUpgradeListener, upstreamWebsocketUrl);
+            return webSocketExecutionExceptionHandler.handle(executionException, upstreamUpgradeListener, upstreamWebsocketUrl);
         } catch (IOException ioException) {
             final String message = String.format("Connectivity failure occurred when connecting to upstream service (%s), %s", upstreamWebsocketUrl, ioException.getMessage());
             log.error(message, ioException);
@@ -120,35 +120,6 @@ public class WebsocketProxyExchangeHandlerFunction implements HandlerFunction<Se
                 .stream()
                 .flatMap(entry -> entry.getValue().stream().map(value -> new String[]{entry.getKey(), value}))
                 .forEach(header -> upstreamUpgradeRequest.setHeader(header[0], header[1]));
-    }
-
-    private static ServerResponse handleExecutionException(ExecutionException executionException, WebsocketUpgradeResponseListener upstreamUpgradeListener, URI upstreamWebsocketUrl) {
-        switch (executionException.getCause()) {
-            case UpgradeException upgradeException -> {
-                return handleUpgradeException(upstreamUpgradeListener, upgradeException);
-            }
-            case Throwable e -> {
-                final String message = String.format("Unexpected failure occurred when gateway <-> upstream service (%s) handshake, %s", upstreamWebsocketUrl, e.getMessage());
-                log.error(message, e);
-                return GatewayServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(message);
-            }
-        }
-    }
-
-    private static ServerResponse handleUpgradeException(WebsocketUpgradeResponseListener upstreamUpgradeListener, UpgradeException upgradeException) {
-        final boolean isHandshakeResponseReady = upstreamUpgradeListener.awaitUntilInvoked(10, TimeUnit.SECONDS);
-        if (isHandshakeResponseReady) {
-            final String message = String.format("Failure occurred when gateway <-> upstream service (%s) handshake: %s, %s", upgradeException.getRequestURI(), upgradeException.getResponseStatusCode(), upstreamUpgradeListener.getReason());
-            log.error(message, upgradeException);
-            return GatewayServerResponse.status(upgradeException.getResponseStatusCode())
-                    .body(message);
-        } else {
-            final String message = String.format("Failure occurred when gateway <-> upstream service (%s) handshake: %s, %s", upgradeException.getRequestURI(), upgradeException.getResponseStatusCode(), upgradeException.getCause().getMessage());
-            log.error(message, upgradeException);
-            return GatewayServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(message);
-        }
     }
 }
 

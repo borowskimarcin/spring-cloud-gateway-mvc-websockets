@@ -48,7 +48,7 @@ public class WebsocketUpgradeResponseListener implements JettyUpgradeListener {
         return response.getReason();
     }
 
-    public boolean awaitUntilInvoked(long timeout, TimeUnit timeUnit) {
+    public boolean awaitForHandshakeResponse(long timeout, TimeUnit timeUnit) {
         try {
             return this.waitUntilListenerInvoked.await(timeout, timeUnit);
         } catch (InterruptedException e) {

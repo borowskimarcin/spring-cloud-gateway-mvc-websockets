@@ -1,6 +1,6 @@
 package com.marbor.gateway.websocket;
 
-import com.marbor.gateway.websocket.WebsocketHelper.GeneralCallback;
+import com.marbor.gateway.websocket.WebSocketHelper.GeneralCallback;
 import org.eclipse.jetty.websocket.api.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,15 +12,15 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import static com.marbor.gateway.websocket.WebsocketHelper.safeClose;
+import static com.marbor.gateway.websocket.WebSocketHelper.safeClose;
 
-public class WebsocketClientSessionHandler implements WebSocketHandler {
+public class WebSocketClientSessionHandler implements WebSocketHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(WebsocketClientSessionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(WebSocketClientSessionHandler.class);
     private final Session upstreamSession;
     private volatile WebSocketSession clientSession;
 
-    public WebsocketClientSessionHandler(Session upstreamSession) {
+    public WebSocketClientSessionHandler(Session upstreamSession) {
         this.upstreamSession = upstreamSession;
     }
 
@@ -40,7 +40,7 @@ public class WebsocketClientSessionHandler implements WebSocketHandler {
                 case TextMessage text -> upstreamSession.sendText(text.getPayload(), new GeneralCallback());
                 case BinaryMessage binary -> upstreamSession.sendBinary(binary.getPayload(), new GeneralCallback());
                 case PongMessage pong -> upstreamSession.sendPong(pong.getPayload(), new GeneralCallback());
-                default -> throw new RuntimeException("Websocket message type not handled");
+                default -> throw new RuntimeException("WebSocket message type not handled");
             }
         }
     }

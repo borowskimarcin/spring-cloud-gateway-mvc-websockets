@@ -21,14 +21,14 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static com.marbor.gateway.websocket.WebsocketHelper.safeClose;
+import static com.marbor.gateway.websocket.WebSocketHelper.safeClose;
 
 
 public class WebsocketUpstreamSessionHandler implements Session.Listener.AutoDemanding {
 
     private static final Logger log = LoggerFactory.getLogger(WebsocketUpstreamSessionHandler.class);
     private final CountDownLatch waitUntilClientSessionReady = new CountDownLatch(1);
-    private volatile WebsocketClientSessionHandler clientSessionHandler;
+    private volatile WebSocketClientSessionHandler clientSessionHandler;
     private volatile Session upstreamSession;
     private final HttpServletRequest httpServletRequest;
     private final HttpServletResponse httpServletResponse;
@@ -41,7 +41,7 @@ public class WebsocketUpstreamSessionHandler implements Session.Listener.AutoDem
     @Override
     public void onWebSocketOpen(Session session) {
         this.upstreamSession = session;
-        this.clientSessionHandler = new WebsocketClientSessionHandler(session);
+        this.clientSessionHandler = new WebSocketClientSessionHandler(session);
         final var webSocketHttpRequestHandler = new WebSocketHttpRequestHandler(clientSessionHandler, new DefaultHandshakeHandler());
         try {
             webSocketHttpRequestHandler.handleRequest(httpServletRequest, httpServletResponse);
@@ -103,7 +103,7 @@ public class WebsocketUpstreamSessionHandler implements Session.Listener.AutoDem
             return waitUntilClientSessionReady.await(timeout, timeUnit);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Websocket proxying setup interrupted", e);
+            throw new RuntimeException("WebSocket proxying setup interrupted", e);
         }
     }
 }

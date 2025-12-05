@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 
 
 @Configuration
-public class WebsocketConfiguration {
+public class WebSocketConfiguration {
 
     @Bean
     public HttpClient httpClient() {

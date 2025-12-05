@@ -6,11 +6,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 
-public class WebsocketHelper {
+public class WebSocketHelper {
 
-    private static final Logger log = LoggerFactory.getLogger(WebsocketHelper.class);
+    private static final Logger log = LoggerFactory.getLogger(WebSocketHelper.class);
 
-    private WebsocketHelper() {
+    private WebSocketHelper() {
     }
 
     static void safeClose(WebSocketSession session, CloseStatus status) {

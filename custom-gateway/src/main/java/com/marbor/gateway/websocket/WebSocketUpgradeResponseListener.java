@@ -13,7 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class WebsocketUpgradeResponseListener implements JettyUpgradeListener {
+public class WebSocketUpgradeResponseListener implements JettyUpgradeListener {
 
     private final CountDownLatch waitUntilListenerInvoked = new CountDownLatch(1);
     private volatile Map<String, List<String>> headers;

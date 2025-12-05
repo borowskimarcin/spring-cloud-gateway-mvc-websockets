@@ -20,7 +20,7 @@ public class WebSocketExecutionExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(WebSocketExecutionExceptionHandler.class);
 
-    public ServerResponse handle(ExecutionException executionException, WebsocketUpgradeResponseListener upstreamUpgradeListener, URI websocketUrl) {
+    public ServerResponse handle(ExecutionException executionException, WebSocketUpgradeResponseListener upstreamUpgradeListener, URI websocketUrl) {
         switch (executionException.getCause()) {
             case UpgradeException upgradeException -> {
                 return handleUpgradeException(upstreamUpgradeListener, websocketUrl, upgradeException);
@@ -40,7 +40,7 @@ public class WebSocketExecutionExceptionHandler {
         }
     }
 
-    private ServerResponse handleUpgradeException(WebsocketUpgradeResponseListener upstreamUpgradeListener, URI websocketUrl, UpgradeException upgradeException) {
+    private ServerResponse handleUpgradeException(WebSocketUpgradeResponseListener upstreamUpgradeListener, URI websocketUrl, UpgradeException upgradeException) {
         if (upgradeException.getCause() instanceof org.eclipse.jetty.websocket.core.exception.UpgradeException coreUpgradeException) {
             return handleCoreUpgradeException(upstreamUpgradeListener, websocketUrl, coreUpgradeException);
         }
@@ -48,7 +48,7 @@ public class WebSocketExecutionExceptionHandler {
         return handleDefault(upstreamUpgradeListener, websocketUrl, upgradeException);
     }
 
-    private ServerResponse handleCoreUpgradeException(WebsocketUpgradeResponseListener upstreamUpgradeListener, URI websocketUrl, org.eclipse.jetty.websocket.core.exception.UpgradeException coreUpgradeException) {
+    private ServerResponse handleCoreUpgradeException(WebSocketUpgradeResponseListener upstreamUpgradeListener, URI websocketUrl, org.eclipse.jetty.websocket.core.exception.UpgradeException coreUpgradeException) {
         switch (coreUpgradeException.getCause()) {
             case SocketTimeoutException socketTimeoutException -> {
                 String message = String.format("Timeout occurred when gateway <-> upstream service (%s) handshake: %s", websocketUrl, socketTimeoutException.getMessage());
@@ -68,7 +68,7 @@ public class WebSocketExecutionExceptionHandler {
         }
     }
 
-    private ServerResponse handleDefault(WebsocketUpgradeResponseListener upstreamUpgradeListener, URI websocketUrl, RuntimeException upgradeException) {
+    private ServerResponse handleDefault(WebSocketUpgradeResponseListener upstreamUpgradeListener, URI websocketUrl, RuntimeException upgradeException) {
         boolean isHandshakeResponseReady = upstreamUpgradeListener.awaitForHandshakeResponse(1, TimeUnit.SECONDS);
         if (isHandshakeResponseReady) {
             String message = String.format("Failure occurred when gateway <-> upstream service (%s) handshake: %s", websocketUrl, upstreamUpgradeListener.getReason());

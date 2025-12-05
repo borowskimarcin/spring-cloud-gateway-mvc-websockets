@@ -39,9 +39,9 @@ import java.util.stream.Collectors;
 /// ### Notes
 /// - For the upstream WebSocket handshake we use the **Jetty client**, because the Spring `StandardWebSocketClient` implementation does **not** expose the WebSocket handshake status or headers.
 @Component
-public class WebsocketProxyExchangeHandlerFunction implements HandlerFunction<ServerResponse> {
+public class WebSocketProxyExchangeHandlerFunction implements HandlerFunction<ServerResponse> {
 
-    private static final Logger log = LoggerFactory.getLogger(WebsocketProxyExchangeHandlerFunction.class);
+    private static final Logger log = LoggerFactory.getLogger(WebSocketProxyExchangeHandlerFunction.class);
     public static final Set<String> IGNORED_HEADERS = Set.of(HttpHeaders.UPGRADE, HttpHeaders.CONNECTION, "Sec-WebSocket-Accept", HttpHeaders.DATE)
             .stream()
             .map(String::toLowerCase)
@@ -49,7 +49,7 @@ public class WebsocketProxyExchangeHandlerFunction implements HandlerFunction<Se
     private final WebSocketClient websocketClient;
     private final WebSocketExecutionExceptionHandler webSocketExecutionExceptionHandler;
 
-    public WebsocketProxyExchangeHandlerFunction(WebSocketClient websocketClient, WebSocketExecutionExceptionHandler webSocketExecutionExceptionHandler) {
+    public WebSocketProxyExchangeHandlerFunction(WebSocketClient websocketClient, WebSocketExecutionExceptionHandler webSocketExecutionExceptionHandler) {
         this.websocketClient = websocketClient;
         this.webSocketExecutionExceptionHandler = webSocketExecutionExceptionHandler;
     }
@@ -58,7 +58,7 @@ public class WebsocketProxyExchangeHandlerFunction implements HandlerFunction<Se
     public ServerResponse handle(ServerRequest serverRequest) {
         HttpServletResponse servletResponse = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         var upstreamSessionHandler = new WebsocketUpstreamSessionHandler(serverRequest.servletRequest(), servletResponse);
-        var upstreamUpgradeListener = new WebsocketUpgradeResponseListener();
+        var upstreamUpgradeListener = new WebSocketUpgradeResponseListener();
         HttpHeaders clientHeaders = serverRequest.headers().asHttpHeaders();
         URI upstreamWebsocketUrl = getWebsocketUrl(serverRequest);
 

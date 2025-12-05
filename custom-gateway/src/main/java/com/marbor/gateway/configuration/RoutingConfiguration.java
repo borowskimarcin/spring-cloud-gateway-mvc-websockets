@@ -1,7 +1,7 @@
 package com.marbor.gateway.configuration;
 
 
-import com.marbor.gateway.websocket.WebsocketProxyExchangeHandlerFunction;
+import com.marbor.gateway.websocket.WebSocketProxyExchangeHandlerFunction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.function.RouterFunction;
@@ -23,7 +23,7 @@ public class RoutingConfiguration {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> websocketRoute(WebsocketProxyExchangeHandlerFunction websocketProxyExchangeHandlerFunction) {
+    public RouterFunction<ServerResponse> websocketRoute(WebSocketProxyExchangeHandlerFunction websocketProxyExchangeHandlerFunction) {
         return route("websocket_route")
                 .GET("/hello", websocketProxyExchangeHandlerFunction)
                 .before(uri("ws://localhost:8180"))

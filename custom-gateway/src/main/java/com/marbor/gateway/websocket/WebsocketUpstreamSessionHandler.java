@@ -70,6 +70,7 @@ public class WebsocketUpstreamSessionHandler implements Session.Listener.AutoDem
     @Override
     public void onWebSocketBinary(ByteBuffer payload, Callback callback) {
         forwardToClient(new BinaryMessage(payload));
+        callback.succeed();
     }
 
     private void forwardToClient(WebSocketMessage<?> message) {
@@ -96,6 +97,7 @@ public class WebsocketUpstreamSessionHandler implements Session.Listener.AutoDem
     @Override
     public void onWebSocketClose(int statusCode, String reason, Callback callback) {
         safeClose(clientSessionHandler.getClientSession(), new CloseStatus(statusCode, reason));
+        callback.succeed();
     }
 
     public boolean awaitWebsocketProxyingReady(long timeout, TimeUnit timeUnit) {
